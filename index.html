@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ResumeLens — AI Resume Analyzer</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-mark">R</div>
+    <div><div class="brand">ResumeLens</div><div class="tagline">Resume & job-match analyzer</div></div>
+    <span class="badge">STUDENT PROJECT</span>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="eyebrow">CAREER TOOLKIT / 01</div>
+      <h1>Make your resume<br><span>match the opportunity.</span></h1>
+      <p>Compare resume text with a job description, find overlapping skills, and get practical suggestions to improve your application.</p>
+      <div class="hero-pills"><span>✓ Skill matching</span><span>✓ Gap analysis</span><span>✓ Improvement tips</span></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div><div class="eyebrow">YOUR INPUT</div><h2>Analyze a resume</h2></div>
+        <div class="step">01 <span>—</span> 02</div>
+      </div>
+      <form method="post">
+        <div class="field">
+          <label for="resume_text">Resume text</label>
+          <textarea id="resume_text" name="resume_text" rows="10" placeholder="Paste the text from your resume here...">{{ resume_text }}</textarea>
+          <small>Tip: copy text from your resume document. Avoid adding private details you don't need to analyze.</small>
+        </div>
+        <div class="field">
+          <label for="job_description">Job description</label>
+          <textarea id="job_description" name="job_description" rows="7" placeholder="Paste the job description here...">{{ job_description }}</textarea>
+        </div>
+        <button type="submit">Analyze my match <span>→</span></button>
+      </form>
+    </section>
+
+    {% if report %}
+    <section class="results">
+      <div class="results-title"><div><div class="eyebrow">YOUR REPORT</div><h2>Analysis results</h2></div><span class="report-badge">READY</span></div>
+      <div class="score-card">
+        <div class="score-number">{{ report.score }}<span>%</span></div>
+        <div class="score-copy"><h3>Keyword overlap</h3><p>Matched job-description skills divided by detected job skills.</p><div class="bar"><div style="width: {{ report.score }}%"></div></div></div>
+      </div>
+      <div class="stats">
+        <div class="stat"><span>Resume words</span><strong>{{ report.word_count }}</strong></div>
+        <div class="stat"><span>Matched skills</span><strong>{{ report.matched|length }}</strong></div>
+        <div class="stat"><span>Potential gaps</span><strong>{{ report.missing|length }}</strong></div>
+      </div>
+      <div class="result-grid">
+        <article class="result-box">
+          <h3>Skills found in both</h3>
+          {% if report.matched %}<div class="chips">{% for skill in report.matched %}<span class="chip green">{{ skill }}</span>{% endfor %}</div>{% else %}<p class="muted">No matching keywords detected yet.</p>{% endif %}
+        </article>
+        <article class="result-box">
+          <h3>Skills in job description</h3>
+          {% if report.job_skills %}<div class="chips">{% for skill in report.job_skills %}<span class="chip">{{ skill }}</span>{% endfor %}</div>{% else %}<p class="muted">No known skill keywords detected in the job description.</p>{% endif %}
+        </article>
+        <article class="result-box full">
+          <h3>Potential skill gaps</h3>
+          {% if report.missing %}<div class="chips">{% for skill in report.missing %}<span class="chip amber">{{ skill }}</span>{% endfor %}</div>{% else %}<p class="muted">No keyword gaps detected, or no job skills were found.</p>{% endif %}
+          <p class="muted small">Only add a skill to your resume if you genuinely have it.</p>
+        </article>
+        <article class="result-box full">
+          <h3>Suggestions to improve</h3>
+          <ul>{% for tip in report.tips %}<li>{{ tip }}</li>{% endfor %}</ul>
+        </article>
+      </div>
+      <p class="disclaimer">{{ report.note }}</p>
+    </section>
+    {% endif %}
+
+    <footer><span>ResumeLens</span><span>Built with Python + Flask</span><span>Runs locally on your computer</span></footer>
+  </main>
+</body>
+</html>
